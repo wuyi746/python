@@ -1,0 +1,127 @@
+# _*_utf-8_*_
+# 51memo_second.py
+# author:wuyi
+
+import pickle
+
+class Memo:      
+    def __init__(self, name, thing, date):
+        "Memo初始化"  
+        self._id = 0
+        self.name = name
+        self.thing = thing
+        self.date = date
+    
+    @property
+    def id(self):            
+        return self._id
+    
+    def mid(self):
+        "让私有属性_id从0开始自增"
+        self._id += 1
+        return self._id   
+    
+    def mo_input(self):
+        "将输入的值付给变量：self.name,self.thing,self.date"        
+        self.name = input('请添加姓名：')
+        self.thing = input('请添加事件：')
+        self.date = input('请添加时间：')
+        
+
+class MemoAdmin:   
+
+    def __init__(self,memo_list):
+        "MemoAdmin初始化"
+        self.memo_list = memo_list
+    
+    def add(self):
+        "执行添加功能"
+        print('开始添加：')
+        M.mo_input()    # 初始化Memo类，并获取输入函数：mo_input
+        id = M.mid()
+        name = M.name
+        thing = M.thing
+        date = M.date
+        one= {'ID':id, '姓名':name, '事件':thing ,'日期':date}
+        self.memo_list.append(one)
+        admin.save()
+        admin.load()
+    
+    def delete(self):
+        "执行删除功能"
+        del_sel = input("请选择你要删除的记录ID：")
+        self.memo_list.pop(int(del_sel)-1)   # list.pop(index=-1)
+        admin.save()
+        admin.load()       
+    
+    def modify(self):
+        "执行修改功能"
+        mod_sel1 = input("请选择你要修改的ID：")  
+        print(f'需要修改的内容为：{self.memo_list[int(mod_sel1)-1]}')  # 打印mome_list相应ID的值
+        mod_sel2 = input('请输入你需要修改的内容（示例：姓名：wuyi）：\n')
+        mod_sel3 = mod_sel2.split('：')                               # 此处截取为中文冒号'：'
+        self.memo_list[int(mod_sel1)-1][mod_sel3[0]] = mod_sel3[1]
+        admin.save()
+        admin.load()
+
+
+    def query(self):
+        "执行查询功能"          
+        admin.load()
+        que_sel = input("请输入需要查询的内容：\n")
+        for i in self.memo_list:
+            if que_sel in (i.values()):
+                print(i)
+
+    def save(self):
+        # 保存数据到dk.pkl        
+        with open('dk.pkl', 'wb') as f:
+            f.write(pickle.dumps(self.memo_list))
+            print("保存成功")
+    
+    def load(self):
+        # 加载数据到dk.pkl  
+        with open('dk.pkl', 'rb') as f:
+            self.memo_list = pickle.loads(f.read())
+            print("加载完成：")
+            print(self.memo_list)
+
+    def welcome(self):
+        "欢迎词，及选择功能方法"
+        print('欢迎使用51备忘录v2.0'.center(40,'*'))
+
+        menu = {
+            '1':'add',
+            '2':'delete',
+            '3':'modify',
+            '4':'query'
+        }
+        try:        
+            while True:            
+                num = input("""
+                请选择功能编号：
+                1：添加
+                2：删除
+                3：修改
+                4：查询
+                5：退出
+                """.replace(' ',''))                    # 使用字符串的replace方法去掉空格   
+                if 0< int(num) <5:
+                    func = getattr(admin, menu[num])    # 利用反射执行memoadmin类中的方法
+                    func()                
+                elif num == '5':                
+                    break
+                else:
+                    print("请输入正确功能编号")
+                    continue  
+        except Exception:
+            print("错误操作方式，备忘录关闭")                  
+
+
+
+memo_list = []
+M = Memo('','','')
+admin = MemoAdmin(memo_list)
+
+
+admin.welcome()
